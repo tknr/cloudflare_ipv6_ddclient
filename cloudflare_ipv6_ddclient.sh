@@ -1,11 +1,13 @@
 #!/bin/bash
 
 INTERFACE="enp3s0f0"
-API_KEY=<api key>
-EMAIL=<email>
+API_KEY=""
+EMAIL=""
 ZONE="example.com"
 DOMAIN="sub.example.com"
 NAME="sub"
+
+source ~/.config/cloudflare_ipv6_ddclient/config
 
 IP=`ip -o a |\
     grep ${INTERFACE} |\
