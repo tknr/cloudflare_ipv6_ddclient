@@ -4,14 +4,16 @@ INTERFACE="enp3s0f0"
 API_KEY=""
 EMAIL=""
 ZONE="example.com"
-DOMAIN="sub.example.com"
-NAME="sub"
+NAMES="sub"
 
 source ~/.config/cloudflare_ipv6_ddclient/config
 
+NAME_LIST=(${NAMES//,/ })
+
 IP=`ip -o a |\
     grep ${INTERFACE} |\
-    grep "scope global dynamic mngtmpaddr noprefixroute" |\
+    grep "inet6" |\
+    grep "scope global dynamic" |\
     awk '{print $4}' |\
     sed -e 's/\(.*\)\/64/\1/'`
 
@@ -23,6 +25,11 @@ ZONE_ID=`curl -H "x-Auth-Key: ${API_KEY}" \
 	     jq -r .result[0].id`
 
 echo "success to fetch zone id: ${ZONE_ID}"
+
+for NAME in "${NAME_LIST[@]}"
+do
+
+DOMAIN=${NAME}'.'${ZONE}
 
 DOMAIN_ID=`curl -H "x-Auth-Key: ${API_KEY}" \
 	            -H "x-Auth-Email: ${EMAIL}" \
@@ -49,4 +56,4 @@ curl -X PATCH \
      "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/${DOMAIN_ID}"
 
 echo "success to update address"
-
+done
